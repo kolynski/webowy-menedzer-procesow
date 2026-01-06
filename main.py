@@ -1,9 +1,19 @@
 from fastapi import FastAPI, HTTPException, Depends, Security, status
 from fastapi.security import APIKeyHeader
+from fastapi.middleware.cors import CORSMiddleware
 import psutil
 from typing import List, Dict, Any
 
 app = FastAPI()
+
+# Add CORS Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (for development)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 API_KEY = "supersecretapikey"  # In production, use environment variables
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
