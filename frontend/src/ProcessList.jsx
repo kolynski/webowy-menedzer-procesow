@@ -24,6 +24,11 @@ const ProcessList = () => {
 
   useEffect(() => {
     fetchProcesses();
+    const interval = setInterval(() => {
+      fetchProcesses();
+    }, 2000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleKill = async (pid) => {
