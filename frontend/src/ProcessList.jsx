@@ -5,6 +5,7 @@ const ProcessList = () => {
   const [processes, setProcesses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [sortConfig, setSortConfig] = useState({ key: 'pid', direction: 'ascending' });
 
   const fetchProcesses = async () => {
     try {
@@ -67,6 +68,50 @@ const ProcessList = () => {
     }
   };
 
+  const sortedProcesses = React.useMemo(() => {
+    let sortableItems = [...processes];
+    if (sortConfig !== null) {
+      sortableItems.sort((a, b) => {
+        let aValue = a[sortConfig.key];
+        let bValue = b[sortConfig.key];
+        
+        // Handle string sorting for Name and Status
+        if (sortConfig.key === 'name' || sortConfig.key === 'status') {
+           aValue = (aValue || '').toString().toLowerCase();
+           bValue = (bValue || '').toString().toLowerCase();
+        } else {
+           // Handle numeric sorting for PID and Memory
+           aValue = Number(aValue || 0);
+           bValue = Number(bValue || 0);
+        }
+
+        if (aValue < bValue) {
+          return sortConfig.direction === 'ascending' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === 'ascending' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [processes, sortConfig]);
+
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const getSortIndicator = (name) => {
+    if (sortConfig.key === name) {
+      return sortConfig.direction === 'ascending' ? ' ↑' : ' ↓';
+    }
+    return '';
+  };
+
   if (loading) return <div>Loading processes...</div>;
   if (error) return <div>Error loading processes: {error}</div>;
 
@@ -76,15 +121,23 @@ const ProcessList = () => {
       <table border="1" style={{ borderCollapse: 'collapse', width: '100%' }}>
         <thead>
           <tr>
-            <th style={{ padding: '8px', textAlign: 'left' }}>PID</th>
-            <th style={{ padding: '8px', textAlign: 'left' }}>Name</th>
-            <th style={{ padding: '8px', textAlign: 'left' }}>Status</th>
-            <th style={{ padding: '8px', textAlign: 'left' }}>Memory (%)</th>
+            <th style={{ padding: '8px', textAlign: 'left', cursor: 'pointer' }} onClick={() => requestSort('pid')}>
+              PID{getSortIndicator('pid')}
+            </th>
+            <th style={{ padding: '8px', textAlign: 'left', cursor: 'pointer' }} onClick={() => requestSort('name')}>
+              Name{getSortIndicator('name')}
+            </th>
+            <th style={{ padding: '8px', textAlign: 'left', cursor: 'pointer' }} onClick={() => requestSort('status')}>
+              Status{getSortIndicator('status')}
+            </th>
+            <th style={{ padding: '8px', textAlign: 'left', cursor: 'pointer' }} onClick={() => requestSort('memory_percent')}>
+              Memory (%){getSortIndicator('memory_percent')}
+            </th>
             <th style={{ padding: '8px', textAlign: 'left' }}>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {processes.map((proc) => (
+          {sortedProcesses.map((proc) => (
             <tr key={proc.pid}>
               <td style={{ padding: '8px' }}>{proc.pid}</td>
               <td style={{ padding: '8px' }}>{proc.name}</td>
