@@ -15,7 +15,7 @@ const ProcessList = () => {
         headers: {
           'X-API-Key': 'supersecretapikey'
         }
-      });``
+      });
       setProcesses(response.data);
       setLoading(false);
     } catch (err) {
