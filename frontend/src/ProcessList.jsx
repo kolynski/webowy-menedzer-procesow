@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 
 const API_BASE_URL = `http://${window.location.hostname}:8000`;
@@ -81,7 +81,7 @@ const ProcessList = () => {
     }
   };
 
-  const sortedProcesses = React.useMemo(() => {
+  const sortedProcesses = useMemo(() => {
     let sortableItems = [...processes];
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
