@@ -3,59 +3,6 @@ import axios from 'axios';
 
 const API_BASE_URL = `http://${window.location.hostname}:8000`;
 
-// zoptymalizowany komponent wiersza 
-// uzycie react.memo, aby wiersz renderowal sie tylko gdy zmienia sie jego dane
-const ProcessRow = React.memo(({ proc, onKill, onSuspend, onResume }) => {
-  return (
-    <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150 group">
-      <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">{proc.pid}</td>
-      <td className="px-6 py-4 font-medium">{proc.name}</td>
-      <td className="px-6 py-4">
-        <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide
-          ${proc.status === 'running' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 
-            proc.status === 'sleeping' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800' : 
-            'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600'}`}>
-          {proc.status}
-        </span>
-      </td>
-      <td className="px-6 py-4 font-mono text-xs text-gray-600 dark:text-gray-400">
-        {proc.memory_percent ? proc.memory_percent.toFixed(2) : 'N/A'}%
-      </td>
-      <td className="px-6 py-4">
-        <div className="flex items-center gap-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
-          <ActionButton onClick={() => onKill(proc.pid)} color="red" label="Kill" />
-          <div className="h-4 w-px bg-gray-300 dark:bg-gray-700 mx-1"></div>
-          <ActionButton onClick={() => onSuspend(proc.pid)} color="blue" label="Suspend" />
-          <ActionButton onClick={() => onResume(proc.pid)} color="blue" label="Resume" />
-        </div>
-      </td>
-    </tr>
-  );
-});
-
-// pomocniczy komponent przycisku 
-const ActionButton = ({ onClick, color, label }) => {
-  const colorClasses = color === 'red' 
-    ? "hover:border-red-500 hover:text-red-500 dark:hover:border-red-500 dark:hover:text-red-400 focus:ring-red-500/50"
-    : "hover:border-blue-500 hover:text-blue-500 dark:hover:border-blue-400 dark:hover:text-blue-400 focus:ring-blue-500/50";
-
-  return (
-    <button 
-      onClick={onClick} 
-      className={`px-3 py-1.5 text-xs font-semibold rounded-md border-2
-        border-gray-200 dark:border-gray-600 
-        text-gray-500 dark:text-gray-400
-        bg-transparent
-        focus:outline-none focus:ring-2
-        transition-all duration-200 ease-in-out uppercase tracking-wider
-        ${colorClasses}`}
-      title={`${label} Process`}
-    >
-      {label}
-    </button>
-  );
-};
-
 // glowny komponent listy
 const ProcessList = () => {
   const [processes, setProcesses] = useState([]);
@@ -176,13 +123,47 @@ const ProcessList = () => {
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {sortedProcesses.map((proc) => (
-              <ProcessRow 
-                key={proc.pid} 
-                proc={proc} 
-                onKill={handleKill} 
-                onSuspend={handleSuspend} 
-                onResume={handleResume} 
-              />
+              <tr key={proc.pid} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150 group">
+                <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">{proc.pid}</td>
+                <td className="px-6 py-4 font-medium">{proc.name}</td>
+                <td className="px-6 py-4">
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide
+                    ${proc.status === 'running' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 
+                      proc.status === 'sleeping' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800' : 
+                      'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600'}`}>
+                    {proc.status}
+                  </span>
+                </td>
+                <td className="px-6 py-4 font-mono text-xs text-gray-600 dark:text-gray-400">
+                  {proc.memory_percent ? proc.memory_percent.toFixed(2) : 'N/A'}%
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <button 
+                      onClick={() => handleKill(proc.pid)} 
+                      className="px-3 py-1.5 text-xs font-semibold rounded-md border-2 border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 bg-transparent focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out uppercase tracking-wider hover:border-red-500 hover:text-red-500 dark:hover:border-red-500 dark:hover:text-red-400 focus:ring-red-500/50"
+                      title="Kill Process"
+                    >
+                      Kill
+                    </button>
+                    <div className="h-4 w-px bg-gray-300 dark:bg-gray-700 mx-1"></div>
+                    <button 
+                      onClick={() => handleSuspend(proc.pid)} 
+                      className="px-3 py-1.5 text-xs font-semibold rounded-md border-2 border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 bg-transparent focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out uppercase tracking-wider hover:border-blue-500 hover:text-blue-500 dark:hover:border-blue-400 dark:hover:text-blue-400 focus:ring-blue-500/50"
+                      title="Suspend Process"
+                    >
+                      Suspend
+                    </button>
+                    <button 
+                      onClick={() => handleResume(proc.pid)} 
+                      className="px-3 py-1.5 text-xs font-semibold rounded-md border-2 border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 bg-transparent focus:outline-none focus:ring-2 transition-all duration-200 ease-in-out uppercase tracking-wider hover:border-blue-500 hover:text-blue-500 dark:hover:border-blue-400 dark:hover:text-blue-400 focus:ring-blue-500/50"
+                      title="Resume Process"
+                    >
+                      Resume
+                    </button>
+                  </div>
+                </td>
+              </tr>
             ))}
           </tbody>
         </table>
