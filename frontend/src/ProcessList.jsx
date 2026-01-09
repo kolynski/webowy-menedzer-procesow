@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const API_BASE_URL = `http://${window.location.hostname}:8000`;
@@ -9,9 +9,9 @@ const ProcessList = () => {
   const [error, setError] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: 'pid', direction: 'ascending' });
 
-  const fetchProcesses = async () => {
+  const fetchProcesses = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/processes`, {
+      const response = await axios.get(`${API_BASE_URL}/processes?_t=${Date.now()}`, {
         headers: {
           'X-API-Key': 'supersecretapikey'
         }
@@ -23,16 +23,27 @@ const ProcessList = () => {
       setError(err.message);
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchProcesses();
-    const interval = setInterval(() => {
-      fetchProcesses();
-    }, 2000);
+    let isMounted = true;
+    let timeoutId = null;
 
-    return () => clearInterval(interval);
-  }, []);
+    const loop = async () => {
+      if (!isMounted) return;
+      await fetchProcesses();
+      if (isMounted) {
+        timeoutId = setTimeout(loop, 1000);
+      }
+    };
+
+    loop();
+
+    return () => {
+      isMounted = false;
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [fetchProcesses]);
 
   const handleKill = async (pid) => {
     try {
