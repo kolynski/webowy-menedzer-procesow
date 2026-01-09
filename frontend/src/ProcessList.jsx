@@ -125,48 +125,101 @@ const ProcessList = () => {
     return '';
   };
 
-  if (loading) return <div>Loading processes...</div>;
-  if (error) return <div>Error loading processes: {error}</div>;
+  if (loading) return <div className="p-8 text-center text-gray-500 dark:text-gray-400 animate-pulse">Loading processes...</div>;
+  if (error) return <div className="p-8 text-center text-red-500 font-medium">Error loading processes: {error}</div>;
 
   return (
-    <div className="process-list-container">
-      <h2>Running Processes</h2>
-      <table border="1" style={{ borderCollapse: 'collapse', width: '100%' }}>
-        <thead>
-          <tr>
-            <th style={{ padding: '8px', textAlign: 'left', cursor: 'pointer' }} onClick={() => requestSort('pid')}>
-              PID{getSortIndicator('pid')}
-            </th>
-            <th style={{ padding: '8px', textAlign: 'left', cursor: 'pointer' }} onClick={() => requestSort('name')}>
-              Name{getSortIndicator('name')}
-            </th>
-            <th style={{ padding: '8px', textAlign: 'left', cursor: 'pointer' }} onClick={() => requestSort('status')}>
-              Status{getSortIndicator('status')}
-            </th>
-            <th style={{ padding: '8px', textAlign: 'left', cursor: 'pointer' }} onClick={() => requestSort('memory_percent')}>
-              Memory (%){getSortIndicator('memory_percent')}
-            </th>
-            <th style={{ padding: '8px', textAlign: 'left' }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedProcesses.map((proc) => (
-            <tr key={proc.pid}>
-              <td style={{ padding: '8px' }}>{proc.pid}</td>
-              <td style={{ padding: '8px' }}>{proc.name}</td>
-              <td style={{ padding: '8px' }}>{proc.status}</td>
-              <td style={{ padding: '8px' }}>
-                {proc.memory_percent ? proc.memory_percent.toFixed(2) : 'N/A'}
-              </td>
-              <td style={{ padding: '8px' }}>
-                <button onClick={() => handleKill(proc.pid)} style={{ marginRight: '5px' }}>Kill</button>
-                <button onClick={() => handleSuspend(proc.pid)} style={{ marginRight: '5px' }}>Suspend</button>
-                <button onClick={() => handleResume(proc.pid)}>Resume</button>
-              </td>
+    <div className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-300">
+      <div className="overflow-x-auto">
+        <table className="w-full text-left text-sm text-gray-600 dark:text-gray-300">
+          <thead className="bg-gray-50 dark:bg-gray-800/50 text-xs uppercase font-semibold text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+            <tr>
+              <th className="px-6 py-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group" onClick={() => requestSort('pid')}>
+                <div className="flex items-center gap-1">PID<span className="text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 transition-colors">{getSortIndicator('pid')}</span></div>
+              </th>
+              <th className="px-6 py-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group" onClick={() => requestSort('name')}>
+                <div className="flex items-center gap-1">Name<span className="text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 transition-colors">{getSortIndicator('name')}</span></div>
+              </th>
+              <th className="px-6 py-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group" onClick={() => requestSort('status')}>
+                <div className="flex items-center gap-1">Status<span className="text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 transition-colors">{getSortIndicator('status')}</span></div>
+              </th>
+              <th className="px-6 py-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group" onClick={() => requestSort('memory_percent')}>
+                <div className="flex items-center gap-1">Memory (%)<span className="text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 transition-colors">{getSortIndicator('memory_percent')}</span></div>
+              </th>
+              <th className="px-6 py-4">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            {sortedProcesses.map((proc) => (
+              <tr key={proc.pid} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
+                <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">{proc.pid}</td>
+                <td className="px-6 py-4 font-medium">{proc.name}</td>
+                <td className="px-6 py-4">
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide
+                    ${proc.status === 'running' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 
+                      proc.status === 'sleeping' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800' : 
+                      'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600'}`}>
+                    {proc.status}
+                  </span>
+                </td>
+                <td className="px-6 py-4 font-mono text-xs">
+                  {proc.memory_percent ? proc.memory_percent.toFixed(2) : 'N/A'}%
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <button 
+                      onClick={() => handleKill(proc.pid)} 
+                      className="px-3 py-1.5 text-xs font-semibold rounded-md border-2
+                        border-gray-200 dark:border-gray-600 
+                         text-gray-600 dark:text-gray-300
+                         bg-transparent
+                         hover:border-red-500 hover:text-red-500 dark:hover:border-red-500 dark:hover:text-red-400
+                         focus:outline-none focus:ring-2 focus:ring-red-500/50
+                         transition-all duration-200 ease-in-out uppercase tracking-wider"
+                      title="Kill Process"
+                    >
+                      Kill
+                    </button>
+                    <div className="h-4 w-px bg-gray-300 dark:bg-gray-700 mx-1"></div>
+                    <button 
+                      onClick={() => handleSuspend(proc.pid)} 
+                      className="px-3 py-1.5 text-xs font-semibold rounded-md border-2
+                        border-gray-200 dark:border-gray-600 
+                         text-gray-600 dark:text-gray-300
+                         bg-transparent
+                         hover:border-blue-500 hover:text-blue-500 dark:hover:border-blue-400 dark:hover:text-blue-400
+                         focus:outline-none focus:ring-2 focus:ring-blue-500/50
+                         transition-all duration-200 ease-in-out uppercase tracking-wider"
+                      title="Suspend Process"
+                    >
+                      Suspend
+                    </button>
+                    <button 
+                      onClick={() => handleResume(proc.pid)} 
+                      className="px-3 py-1.5 text-xs font-semibold rounded-md border-2
+                        border-gray-200 dark:border-gray-600 
+                         text-gray-600 dark:text-gray-300
+                         bg-transparent
+                         hover:border-blue-500 hover:text-blue-500 dark:hover:border-blue-400 dark:hover:text-blue-400
+                         focus:outline-none focus:ring-2 focus:ring-blue-500/50
+                         transition-all duration-200 ease-in-out uppercase tracking-wider"
+                      title="Resume Process"
+                    >
+                      Resume
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {sortedProcesses.length === 0 && !loading && !error && (
+         <div className="p-12 text-center text-gray-500 dark:text-gray-400 flex flex-col items-center justify-center">
+            <span className="text-4xl mb-2">📭</span>
+            <p>No processes found.</p>
+         </div>
+      )}
     </div>
   );
 };
