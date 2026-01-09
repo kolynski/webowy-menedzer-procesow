@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_BASE_URL = `http://${window.location.hostname}:8000`;
+
 const ProcessList = () => {
   const [processes, setProcesses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -9,11 +11,11 @@ const ProcessList = () => {
 
   const fetchProcesses = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/processes', {
+      const response = await axios.get(`${API_BASE_URL}/processes`, {
         headers: {
           'X-API-Key': 'supersecretapikey'
         }
-      });
+      });``
       setProcesses(response.data);
       setLoading(false);
     } catch (err) {
@@ -34,7 +36,7 @@ const ProcessList = () => {
 
   const handleKill = async (pid) => {
     try {
-      await axios.post(`http://localhost:8000/processes/${pid}/kill`, {}, {
+      await axios.post(`${API_BASE_URL}/processes/${pid}/kill`, {}, {
         headers: { 'X-API-Key': 'supersecretapikey' }
       });
       fetchProcesses();
@@ -46,7 +48,7 @@ const ProcessList = () => {
 
   const handleSuspend = async (pid) => {
     try {
-      await axios.post(`http://localhost:8000/processes/${pid}/suspend`, {}, {
+      await axios.post(`${API_BASE_URL}/processes/${pid}/suspend`, {}, {
         headers: { 'X-API-Key': 'supersecretapikey' }
       });
       fetchProcesses();
@@ -58,7 +60,7 @@ const ProcessList = () => {
 
   const handleResume = async (pid) => {
     try {
-      await axios.post(`http://localhost:8000/processes/${pid}/resume`, {}, {
+      await axios.post(`${API_BASE_URL}/processes/${pid}/resume`, {}, {
         headers: { 'X-API-Key': 'supersecretapikey' }
       });
       fetchProcesses();
