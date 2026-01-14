@@ -6,16 +6,15 @@ from typing import List, Dict, Any
 
 app = FastAPI()
 
-# Add CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins (for development)
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-API_KEY = "supersecretapikey"  # In production, use environment variables
+API_KEY = "supersecretapikey"
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
 async def get_api_key(api_key: str = Security(api_key_header)):
@@ -31,16 +30,11 @@ def get_processes():
     processes = []
     for proc in psutil.process_iter(['pid', 'name', 'status', 'memory_percent']):
         try:
-            # Fetch process info; process_iter yields a Process object
-            # passing attrs to process_iter is more efficient than accessing attributes one by one
-            # but we can also access proc.info since we passed the attrs list
             process_info = proc.info
             processes.append(process_info)
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-            # Process might have terminated or we don't have permission
             continue
         except Exception as e:
-            # Generic error handling as requested, though usually specific is better
             print(f"Error accessing process: {e}")
             continue
             

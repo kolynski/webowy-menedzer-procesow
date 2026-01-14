@@ -3,7 +3,6 @@ import axios from 'axios';
 
 const API_BASE_URL = `http://${window.location.hostname}:8000`;
 
-// glowny komponent listy
 const ProcessList = () => {
   const [processes, setProcesses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +29,7 @@ const ProcessList = () => {
     const loop = async () => {
       if (!isMounted) return;
       await fetchProcesses();
-      if (isMounted) timeoutId = setTimeout(loop, 2000); // odswiezaj co 2 sekundy
+      if (isMounted) timeoutId = setTimeout(loop, 2000);
     };
     loop();
     return () => {
@@ -39,11 +38,9 @@ const ProcessList = () => {
     };
   }, [fetchProcesses]);
 
-  // uzycie useCallback, zeby te funkcje nie zmienialy się przy kazdym renderze
   const handleKill = useCallback(async (pid) => {
     try {
       await axios.post(`${API_BASE_URL}/processes/${pid}/kill`, {}, { headers: { 'X-API-Key': 'supersecretapikey' } });
-      // nie wywoluje fetchProcesses natychmiastowo recznie, czekam na loop, zeby nie zatykac UI
     } catch (err) {
       alert(`Failed to kill process ${pid}: ${err.message}`);
     }
