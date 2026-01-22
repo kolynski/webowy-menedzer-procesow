@@ -5,7 +5,7 @@ Instrukcja dla osób używających edytora VS Code i wbudowanego terminala (Powe
 Zainstalowane: Git, Python, Node.js.
 ### Krok 1: Pobranie i Backend
 Otwórz nowe okno VS Code.
-Otwórz terminal (Terminal > New Terminal).
+Otwórz terminal.
 Wykonaj kolejno komendy:
 1. git clone https://github.com/kolynski/webowy-menedzer-procesow.git
 2. cd webowy-menedzer-procesow
@@ -14,7 +14,7 @@ Wykonaj kolejno komendy:
 5. pip install fastapi uvicorn psutil
 6. uvicorn main:app --reload --host 0.0.0.0
 ### Krok 2: Frontend
-Otwórz drugi terminal (kliknij ikonę + w panelu terminala).
+Otwórz drugi terminal.
 Wpisz komendy:
 1. cd webowy-menedzer-procesow
 2. cd frontend
@@ -22,13 +22,13 @@ Wpisz komendy:
 4. npm run dev
 Kliknij z wciśniętym Ctrl w link: Network: (w moim przypadku http://192.168.1.11:5173)
 
-# Instrukcja 2: Wiersz polecenia (CMD)
+# Instrukcja 2: Wiersz polecenia
 Instrukcja dla osób korzystających ze standardowej konsoli systemu Windows (CMD).
 
 ## Wymagania
 Zainstalowane: Git, Python, Node.js.
 ### Krok 1: Pobranie i Backend
-Otwórz Wiersz polecenia (CMD).
+Otwórz Wiersz polecenia.
 Wpisz komendy:
 1. git clone https://github.com/kolynski/webowy-menedzer-procesow.git
 2. cd webowy-menedzer-procesow
